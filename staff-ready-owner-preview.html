@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Staff-Ready Owner Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+      :root {
+        --bg: #f2f5f3;
+        --surface: #ffffff;
+        --surface-2: #eaf0ed;
+        --ink: #15211c;
+        --ink-soft: #40534b;
+        --ink-faint: #6d8178;
+        --line: #d5ded9;
+        --accent: #0d6b57;
+        --accent-strong: #095544;
+        --accent-soft: #dff0e9;
+        --amber: #8f620d;
+        --amber-soft: #faf0d4;
+        --paper: #ffffff;
+        --paper-ink: #111111;
+        --shadow: 0 1px 2px rgba(16,38,30,.07), 0 10px 28px rgba(16,38,30,.07);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1513;
+          --surface: #19211e;
+          --surface-2: #212c27;
+          --ink: #e7efec;
+          --ink-soft: #b2c3bc;
+          --ink-faint: #83968d;
+          --line: #32423b;
+          --accent: #3db696;
+          --accent-strong: #63c9ac;
+          --accent-soft: #16382e;
+          --amber: #dfa94d;
+          --amber-soft: #392d12;
+          --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 28px rgba(0,0,0,.3);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Libre Franklin", system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
+      button { font: inherit; cursor: pointer; }
+      .wrap { max-width: 1020px; margin: 0 auto; padding: 0 18px 64px; }
+
+      /* ---------- header band ---------- */
+      .topband {
+        background: var(--accent-strong);
+        color: #eef7f3;
+      }
+      @media (prefers-color-scheme: dark) { .topband { background: #123c31; } }
+      .topband .wrap { padding-top: 30px; padding-bottom: 30px; }
+      .brandrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .brandname { font-weight: 800; font-size: 20px; letter-spacing: .01em; }
+      .previewtag {
+        font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+        background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35);
+        padding: 4px 10px; border-radius: 999px;
+      }
+      .topband h1 {
+        margin: 18px 0 8px; font-size: clamp(26px, 4.6vw, 38px); line-height: 1.15; font-weight: 800; max-width: 22ch;
+      }
+      .topband p { margin: 0; max-width: 62ch; color: #cfe6dc; font-size: 16.5px; }
+      .topband .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        border-radius: 10px; border: 1px solid transparent; padding: 10px 18px;
+        font-weight: 700; font-size: 15.5px; text-decoration: none; min-height: 44px;
+      }
+      .btn-light { background: #ffffff; color: #0a4f40; }
+      .btn-ghost { background: transparent; color: #eef7f3; border-color: rgba(255,255,255,.55); }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-primary:hover { background: var(--accent-strong); }
+      @media (prefers-color-scheme: dark) { .btn-primary { color: #08130f; } .btn-primary:hover { color: #08130f; } }
+      .btn-quiet { background: var(--surface); color: var(--ink); border-color: var(--line); }
+      .btn-small { min-height: 38px; padding: 7px 13px; font-size: 14px; border-radius: 9px; }
+
+      /* ---------- steps strip ---------- */
+      .steps {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 6px;
+      }
+      .step { display: flex; gap: 12px; align-items: flex-start; }
+      .stepnum {
+        flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+        background: var(--accent-soft); color: var(--accent-strong);
+        display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
+      }
+      .step h3 { margin: 2px 0 3px; font-size: 15.5px; }
+      .step p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+      @media (max-width: 680px) { .steps { grid-template-columns: 1fr; } }
+
+      /* ---------- view tabs ---------- */
+      .viewbar {
+        display: flex; gap: 8px; margin: 26px 0 18px; padding: 5px;
+        background: var(--surface-2); border-radius: 12px; width: fit-content; max-width: 100%;
+      }
+      .viewtab {
+        border: 0; background: transparent; color: var(--ink-soft); font-weight: 700;
+        padding: 9px 18px; border-radius: 9px; font-size: 15px; min-height: 42px;
+      }
+      .viewtab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(16,38,30,.15); }
+      .viewhint { font-size: 14px; color: var(--ink-faint); margin: 0 0 16px; }
+
+      /* ---------- panels & cards ---------- */
+      .panel {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        box-shadow: var(--shadow); padding: 22px;
+      }
+      .panel + .panel { margin-top: 16px; }
+      .panel h2 { margin: 0 0 4px; font-size: 20px; }
+      .panel .sub { margin: 0 0 16px; color: var(--ink-soft); font-size: 14.5px; }
+      .hidden { display: none !important; }
+
+      .badge {
+        display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700;
+        padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+      }
+      .badge-done { background: var(--accent-soft); color: var(--accent-strong); }
+      .badge-pending { background: var(--amber-soft); color: var(--amber); }
+      .check { font-weight: 800; }
+
+      dl.fields { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
+      dl.fields > div { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+      dl.fields dt { color: var(--ink-faint); font-size: 14px; }
+      dl.fields dd { margin: 0; font-weight: 600; font-size: 14.5px; text-align: right; }
+      @media (max-width: 680px) { dl.fields { grid-template-columns: 1fr; } }
+
+      .formrow {
+        display: flex; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .formrow:last-child { border-bottom: 0; }
+      .formrow .grow { flex: 1 1 220px; }
+      .formrow h3 { margin: 0 0 2px; font-size: 16.5px; }
+      .formrow p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+      .formrow .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+      .sigline { font-family: "Caveat", cursive; font-size: 30px; font-weight: 700; line-height: 1; }
+
+      /* manager stats */
+      .stats { display: flex; gap: 26px; flex-wrap: wrap; margin-bottom: 6px; }
+      .stat b { display: block; font-size: 24px; line-height: 1.1; }
+      .stat span { font-size: 13.5px; color: var(--ink-faint); }
+
+      .workerrow {
+        display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+        padding: 16px 0; border-bottom: 1px solid var(--line);
+      }
+      .workerrow:last-child { border-bottom: 0; }
+      .avatar {
+        width: 46px; height: 46px; border-radius: 50%; flex: 0 0 auto;
+        background: var(--accent-soft); color: var(--accent-strong);
+        display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px;
+      }
+      .workerrow .grow { flex: 1 1 200px; }
+      .workerrow h3 { margin: 0 0 2px; font-size: 16.5px; }
+      .workerrow p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+      .packetbar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
+      .note { font-size: 13.5px; color: var(--ink-faint); }
+
+      footer { margin-top: 34px; font-size: 13.5px; color: var(--ink-faint); }
+      footer p { margin: 4px 0; }
+
+      /* ---------- official document sheets ---------- */
+      .docbar {
+        display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px;
+      }
+      .docbar .grow { flex: 1 1 auto; }
+      .sheet-scroll { padding-bottom: 6px; }
+      .sheet {
+        background: var(--paper); color: var(--paper-ink); width: 816px; max-width: 100%;
+        margin: 0 auto; padding: 40px 44px; box-shadow: var(--shadow);
+        font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; line-height: 1.35;
+      }
+      @media (max-width: 680px) { .sheet { padding: 22px 16px; font-size: 11.5px; } }
+      .sheet h1, .sheet h2, .sheet h3 { font-family: Arial, Helvetica, sans-serif; }
+      .sheet .fill { font-family: "Segoe Print", "Bradley Hand", cursive; color: #14337f; font-size: 13.5px; }
+      .sheet .filltyped { font-family: "Courier New", monospace; color: #14337f; font-weight: 700; }
+      .sheet table { border-collapse: collapse; width: 100%; }
+      .sheet td, .sheet th { border: 1px solid #333; padding: 4px 6px; vertical-align: top; }
+      .sheet .lbl { font-size: 9.5px; color: #222; display: block; }
+      .sheet .hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px double #111; padding-bottom: 6px; margin-bottom: 10px; }
+      .sheet .formtitle { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+      .sheet .dept { font-size: 12px; font-weight: 700; text-align: right; }
+      .sheet .notice { border: 1.5px solid #111; padding: 7px 9px; font-size: 11px; margin: 10px 0; }
+      .sheet .secttl { background: #111; color: #fff; font-weight: 700; padding: 4px 8px; font-size: 13px; margin: 14px 0 0; }
+      .sheet .sectsub { border: 1px solid #333; border-top: 0; padding: 5px 8px; font-size: 11px; }
+      .sheet .sig { font-family: "Caveat", cursive; font-size: 27px; color: #14337f; line-height: 1; }
+      .sheet .chk { font-weight: 800; font-size: 14px; }
+      .sheet .small { font-size: 10.5px; }
+      .sheet .foot { margin-top: 12px; font-size: 10px; display: flex; justify-content: space-between; }
+      .sheet .blanksec { color: #555; font-style: italic; }
+      .pagebreak { page-break-before: always; }
+      /* staging area used only while a PDF is being captured — must stay
+         on-screen and in the viewport or the capture comes out blank */
+      .pdf-stage {
+        position: fixed; inset: 0; z-index: 9999; background: #ffffff;
+        overflow: auto; padding: 28px 12px 40px;
+      }
+      .pdf-stage .sheet { box-shadow: none; }
+      .pdf-stage-note {
+        max-width: 816px; margin: 0 auto 14px; font-size: 14px; color: #40534b;
+        display: flex; align-items: center; gap: 10px;
+      }
+      .pdf-stage-note b { color: #15211c; }
+      @media print {
+        body * { visibility: hidden; }
+        #docArea, #docArea * { visibility: visible; }
+        #docArea { position: absolute; inset: 0; }
+        .docbar { display: none; }
+        .sheet { box-shadow: none; width: 100%; padding: 10px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topband">
+      <div class="wrap">
+        <div class="brandrow">
+          <span class="brandname">Staff-Ready</span>
+          <span class="previewtag">Owner preview</span>
+        </div>
+        <h1>A new hire&rsquo;s paperwork, already filled in.</h1>
+        <p>This short preview is set up with a finished example, so you don&rsquo;t have to type anything. A sample worker, Amina Yusuf, has completed the only two forms in this preview &mdash; the federal <strong>Form W-4</strong> and <strong>Form I-9</strong>. Look at what she saw, then open the manager view and download her forms the way you would in the real system.</p>
+        <div class="cta-row">
+          <button class="btn btn-light" id="ctaManager" type="button">Open the manager view</button>
+          <button class="btn btn-ghost" id="ctaWorker" type="button">See the worker&rsquo;s side first</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="steps" aria-label="How it works">
+        <div class="step">
+          <div class="stepnum">1</div>
+          <div>
+            <h3>The worker fills it in once</h3>
+            <p>On her phone, in one sitting &mdash; about ten minutes. Her answers carry from field to field.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="stepnum">2</div>
+          <div>
+            <h3>You watch it land</h3>
+            <p>Her packet shows up in your manager view, marked complete the moment she signs.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="stepnum">3</div>
+          <div>
+            <h3>You download the real forms</h3>
+            <p>The W-4 and I-9 come out in the government&rsquo;s own layout, ready to print and file.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="viewbar" role="tablist" aria-label="Choose a view">
+        <button class="viewtab" id="tabWorker" role="tab" aria-selected="false" type="button">Worker view</button>
+        <button class="viewtab" id="tabManager" role="tab" aria-selected="true" type="button">Manager view</button>
+      </div>
+
+      <!-- ============ WORKER VIEW ============ -->
+      <section id="viewWorker" class="hidden" aria-label="Worker view">
+        <p class="viewhint">This is what Amina saw on her phone. In this preview her answers are already in &mdash; a real worker types her own.</p>
+
+        <div class="panel">
+          <h2>Amina&rsquo;s information</h2>
+          <p class="sub">Entered once, then used across both forms automatically.</p>
+          <dl class="fields">
+            <div><dt>Legal name</dt><dd>Amina Yusuf</dd></div>
+            <div><dt>Date of birth</dt><dd>03/18/1994</dd></div>
+            <div><dt>Home address</dt><dd>1284 Lexington Ave S, Mendota Heights, MN 55118</dd></div>
+            <div><dt>Email</dt><dd>amina.yusuf@example.com</dd></div>
+            <div><dt>Phone</dt><dd>(651) 555-0148</dd></div>
+            <div><dt>Work status</dt><dd>A citizen of the United States</dd></div>
+          </dl>
+        </div>
+
+        <div class="panel">
+          <h2>Her two forms</h2>
+          <p class="sub">Both signed on November 14, 2026. Nothing left for her to do.</p>
+          <div class="formrow">
+            <div class="grow">
+              <h3>Form W-4 &mdash; Employee&rsquo;s Withholding Certificate</h3>
+              <p>Filing status: Single &middot; one job &middot; no credits claimed in Step 3</p>
+            </div>
+            <span class="badge badge-done"><span class="check">&#10003;</span> Signed</span>
+          </div>
+          <div class="formrow">
+            <div class="grow">
+              <h3>Form I-9 &mdash; Employment Eligibility Verification</h3>
+              <p>Section 1 completed and attested. Section 2 is yours to finish in person, after you examine her original documents &mdash; that split is required by law.</p>
+            </div>
+            <span class="badge badge-done"><span class="check">&#10003;</span> Signed</span>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:22px; flex-wrap:wrap; align-items:flex-end;">
+            <div>
+              <div class="sigline">Amina Yusuf</div>
+              <div class="note">Amina&rsquo;s signature, drawn on her phone</div>
+            </div>
+            <div class="note">Signed 11/14/2026</div>
+          </div>
+        </div>
+
+        <div class="packetbar">
+          <button class="btn btn-primary" id="workerToManager" type="button">Now see what you get &mdash; open the manager view</button>
+        </div>
+      </section>
+
+      <!-- ============ MANAGER VIEW ============ -->
+      <section id="viewManager" aria-label="Manager view">
+        <p class="viewhint">This is your side of Staff-Ready, for North Star Home Care LLC. Amina&rsquo;s packet is complete &mdash; open her file and try the downloads.</p>
+
+        <div class="panel">
+          <h2>Workers</h2>
+          <p class="sub">Everyone you&rsquo;ve invited, and where their paperwork stands.</p>
+          <div class="stats">
+            <div class="stat"><b>1</b><span>worker in this preview</span></div>
+            <div class="stat"><b>2 of 2</b><span>forms complete</span></div>
+            <div class="stat"><b>Ready</b><span>packet status</span></div>
+          </div>
+          <div class="workerrow">
+            <div class="avatar" aria-hidden="true">AY</div>
+            <div class="grow">
+              <h3>Amina Yusuf</h3>
+              <p>Personal Care Assistant &middot; invited Nov 12, 2026 &middot; finished Nov 14, 2026</p>
+            </div>
+            <span class="badge badge-done"><span class="check">&#10003;</span> Packet complete</span>
+            <button class="btn btn-quiet btn-small" id="toggleFile" type="button" aria-expanded="true">Hide file</button>
+          </div>
+
+          <div id="workerFile">
+            <div class="formrow">
+              <div class="grow">
+                <h3>Form W-4 (2026)</h3>
+                <p>Signed by Amina Yusuf on 11/14/2026 &middot; downloads in the official IRS layout</p>
+              </div>
+              <div class="actions">
+                <button class="btn btn-quiet btn-small" data-doc="w4" type="button">View form</button>
+                <button class="btn btn-primary btn-small" data-download="w4" type="button">Download PDF</button>
+              </div>
+            </div>
+            <div class="formrow">
+              <div class="grow">
+                <h3>Form I-9 (Edition 08/01/23)</h3>
+                <p>Section 1 signed by Amina Yusuf on 11/14/2026 &middot; Section 2 blank for you to complete in person &middot; downloads in the official USCIS layout</p>
+              </div>
+              <div class="actions">
+                <button class="btn btn-quiet btn-small" data-doc="i9" type="button">View form</button>
+                <button class="btn btn-primary btn-small" data-download="i9" type="button">Download PDF</button>
+              </div>
+            </div>
+            <div class="packetbar">
+              <button class="btn btn-primary" data-download="packet" type="button">Download full packet (both forms)</button>
+              <span class="note" id="dlStatus" role="status"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>What happens with a real worker</h2>
+          <p class="sub" style="margin-bottom:0">You send one invite link. The worker completes the forms on her phone; anyone who stops halfway shows here as <span class="badge badge-pending">Pending</span> and can pick up where she left off. When she signs, her file lands here exactly like Amina&rsquo;s &mdash; and each form downloads as the official government document, not a summary sheet.</p>
+        </div>
+      </section>
+
+      <!-- ============ DOCUMENT VIEW ============ -->
+      <section id="viewDoc" class="hidden" aria-label="Form document">
+        <div class="docbar">
+          <button class="btn btn-quiet" id="backToManager" type="button">&larr; Back to manager view</button>
+          <span class="grow"></span>
+          <span class="note" id="docStatus" role="status"></span>
+          <button class="btn btn-primary" id="docDownload" type="button">Download PDF</button>
+        </div>
+        <div class="sheet-scroll">
+          <div id="docArea"></div>
+        </div>
+      </section>
+
+      <footer>
+        <p>Staff-Ready owner preview &mdash; two forms only (W-4 and I-9). The full system carries the rest of the onboarding packet.</p>
+        <p>Every name, address, and number on this page is a made-up sample, so you can click and download freely.</p>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        var tabWorker = document.getElementById('tabWorker');
+        var tabManager = document.getElementById('tabManager');
+        var viewWorker = document.getElementById('viewWorker');
+        var viewManager = document.getElementById('viewManager');
+        var viewDoc = document.getElementById('viewDoc');
+        var docArea = document.getElementById('docArea');
+        var docDownload = document.getElementById('docDownload');
+        var dlStatus = document.getElementById('dlStatus');
+        var docStatus = document.getElementById('docStatus');
+        var currentDoc = 'w4';
+
+        function showView(which) {
+          viewWorker.classList.toggle('hidden', which !== 'worker');
+          viewManager.classList.toggle('hidden', which !== 'manager');
+          viewDoc.classList.toggle('hidden', which !== 'doc');
+          tabWorker.setAttribute('aria-selected', which === 'worker' ? 'true' : 'false');
+          tabManager.setAttribute('aria-selected', (which === 'manager' || which === 'doc') ? 'true' : 'false');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        tabWorker.addEventListener('click', function () { showView('worker'); });
+        tabManager.addEventListener('click', function () { showView('manager'); });
+        document.getElementById('ctaManager').addEventListener('click', function () { showView('manager'); });
+        document.getElementById('ctaWorker').addEventListener('click', function () { showView('worker'); });
+        document.getElementById('workerToManager').addEventListener('click', function () { showView('manager'); });
+        document.getElementById('backToManager').addEventListener('click', function () { showView('manager'); });
+
+        var workerFile = document.getElementById('workerFile');
+        var toggleFile = document.getElementById('toggleFile');
+        toggleFile.addEventListener('click', function () {
+          var open = workerFile.classList.toggle('hidden');
+          toggleFile.textContent = open ? 'Open file' : 'Hide file';
+          toggleFile.setAttribute('aria-expanded', open ? 'false' : 'true');
+        });
+
+        /* ---------------- official form sheets ---------------- */
+
+        function w4Sheet() {
+          return '' +
+          '<div class="sheet" id="sheetW4">' +
+            '<div class="hdr">' +
+              '<div><div class="formtitle">Form W-4 <span style="font-size:15px; font-weight:600;">(2026)</span></div><div>Employee&rsquo;s Withholding Certificate</div></div>' +
+              '<div class="dept">Department of the Treasury<br/>Internal Revenue Service</div>' +
+            '</div>' +
+            '<div style="text-align:center; font-weight:700; font-size:15px;">Employee&rsquo;s Withholding Certificate</div>' +
+            '<p class="small" style="margin:6px 0;">Complete Steps 1&ndash;4 ONLY if they apply to you; otherwise, skip to Step 5. See instructions and the Tax Withholding Estimator at www.irs.gov/W4App.</p>' +
+            '<table><tr>' +
+              '<td colspan="3"><span class="lbl">Step 1: (a) First name and middle initial</span><span class="fill">Amina</span></td>' +
+              '<td colspan="3"><span class="lbl">Last name</span><span class="fill">Yusuf</span></td>' +
+              '<td colspan="2"><span class="lbl">(b) Social security number</span><span class="filltyped">&bull;&bull;&bull;-&bull;&bull;-6789</span></td>' +
+            '</tr><tr>' +
+              '<td colspan="5"><span class="lbl">Address</span><span class="fill">1284 Lexington Ave S</span></td>' +
+              '<td colspan="3"><span class="lbl">(c) Filing status (check one)</span>&#9746; Single or married filing separately<br/>&#9744; Married filing jointly &nbsp; &#9744; Head of household</td>' +
+            '</tr><tr>' +
+              '<td colspan="5"><span class="lbl">City or town, state, and ZIP code</span><span class="fill">Mendota Heights, MN 55118</span></td>' +
+              '<td colspan="3" class="small">Does the name on your social security card differ from above? See instructions.</td>' +
+            '</tr></table>' +
+            '<p style="margin:10px 0 4px;"><b>Step 2: Multiple Jobs or Spouse Works.</b> Complete this step if you (1) hold more than one job at a time, or (2) are married filing jointly and your spouse also works.</p>' +
+            '<p class="small" style="margin:0 0 4px;">&#9744; (c) If there are only two jobs total, you may check this box. &nbsp; <span class="blanksec">Not checked &mdash; Amina holds one job.</span></p>' +
+            '<p style="margin:8px 0 4px;"><b>Step 3: Claim Dependent and Other Credits</b></p>' +
+            '<table><tr><td style="width:82%;">(a) Number of qualifying children under age 17 &times; $2,000</td><td><span class="filltyped">0 &rarr; $0</span></td></tr>' +
+            '<tr><td>(b) Number of other dependents &times; $500</td><td><span class="filltyped">0 &rarr; $0</span></td></tr>' +
+            '<tr><td>(c) Other credits</td><td><span class="filltyped">$0</span></td></tr>' +
+            '<tr><td><b>Total credits</b></td><td><span class="filltyped">$0</span></td></tr></table>' +
+            '<p style="margin:10px 0 4px;"><b>Step 4 (optional): Other Adjustments</b></p>' +
+            '<table><tr><td style="width:70%;">(a) Other income (not from jobs)</td><td><span class="blanksec">Left blank</span></td></tr>' +
+            '<tr><td>(b) Deductions</td><td><span class="blanksec">Left blank</span></td></tr>' +
+            '<tr><td>(c) Extra withholding per pay period</td><td><span class="blanksec">Left blank</span></td></tr></table>' +
+            '<p style="margin:10px 0 4px;"><b>Step 5: Sign Here.</b> Under penalties of perjury, I declare that this certificate, to the best of my knowledge and belief, is true, correct, and complete.</p>' +
+            '<table><tr>' +
+              '<td style="width:55%;"><span class="lbl">Employee&rsquo;s signature (This form is not valid unless you sign it.)</span><span class="sig">Amina Yusuf</span></td>' +
+              '<td><span class="lbl">Date</span><span class="fill">11/14/2026</span></td>' +
+            '</tr></table>' +
+            '<table style="margin-top:8px;"><tr>' +
+              '<td colspan="2"><span class="lbl">Employers Only &mdash; Employer&rsquo;s name and address</span>North Star Home Care LLC, Eagan, MN</td>' +
+              '<td><span class="lbl">First date of employment</span><span class="blanksec">To be completed by employer</span></td>' +
+              '<td><span class="lbl">Employer identification number (EIN)</span><span class="blanksec">On file</span></td>' +
+            '</tr></table>' +
+            '<div class="foot"><span>For Privacy Act and Paperwork Reduction Act Notice, see page 3.</span><span>Cat. No. 10220X &middot; Form W-4 (2026)</span></div>' +
+          '</div>';
+        }
+
+        function i9Sheet() {
+          return '' +
+          '<div class="sheet" id="sheetI9">' +
+            '<div class="hdr">' +
+              '<div><div class="formtitle">Form I-9</div><div>Employment Eligibility Verification</div></div>' +
+              '<div class="dept">Department of Homeland Security<br/>U.S. Citizenship and Immigration Services</div>' +
+            '</div>' +
+            '<div class="notice"><b>START HERE:</b> Employers must ensure the form instructions are available to employees when completing this form. Employers are liable for failing to comply with the requirements for completing this form. See instructions at uscis.gov/i-9.</div>' +
+            '<p class="small" style="margin:4px 0;"><b>ANTI-DISCRIMINATION NOTICE:</b> All employees can choose which acceptable documentation to present for Form I-9. Employers cannot ask employees for documentation to verify information in Section 1, or specify which acceptable documentation employees must present for Section 2 or Supplement B.</p>' +
+            '<div class="secttl">Section 1. Employee Information and Attestation</div>' +
+            '<div class="sectsub">Employees must complete and sign Section 1 of Form I-9 no later than their first day of employment, but not before accepting a job offer.</div>' +
+            '<table><tr>' +
+              '<td colspan="3"><span class="lbl">Last Name (Family Name)</span><span class="fill">Yusuf</span></td>' +
+              '<td colspan="3"><span class="lbl">First Name (Given Name)</span><span class="fill">Amina</span></td>' +
+              '<td colspan="2"><span class="lbl">Middle Initial (if any)</span><span class="blanksec">&mdash;</span></td>' +
+            '</tr><tr>' +
+              '<td colspan="4"><span class="lbl">Address (Street Number and Name)</span><span class="fill">1284 Lexington Ave S</span></td>' +
+              '<td><span class="lbl">Apt. Number (if any)</span><span class="blanksec">&mdash;</span></td>' +
+              '<td colspan="2"><span class="lbl">City or Town</span><span class="fill">Mendota Heights</span></td>' +
+              '<td><span class="lbl">State</span><span class="fill">MN</span></td>' +
+            '</tr><tr>' +
+              '<td><span class="lbl">ZIP Code</span><span class="fill">55118</span></td>' +
+              '<td colspan="2"><span class="lbl">Date of Birth (mm/dd/yyyy)</span><span class="fill">03/18/1994</span></td>' +
+              '<td colspan="2"><span class="lbl">U.S. Social Security Number</span><span class="blanksec">Not collected in this preview</span></td>' +
+              '<td colspan="3"><span class="lbl">Employee&rsquo;s Email Address &amp; Telephone Number</span><span class="fill">amina.yusuf@example.com &middot; (651) 555-0148</span></td>' +
+            '</tr></table>' +
+            '<p style="margin:10px 0 4px;"><b>I am aware that federal law provides for imprisonment and/or fines for false statements, or the use of false documents, in connection with the completion of this form. I attest, under penalty of perjury, that I am (check one of the following boxes):</b></p>' +
+            '<table><tr><td><span class="chk">&#9746;</span> 1. A citizen of the United States</td><td><span class="chk">&#9744;</span> 2. A noncitizen national of the United States</td></tr>' +
+            '<tr><td><span class="chk">&#9744;</span> 3. A lawful permanent resident</td><td><span class="chk">&#9744;</span> 4. A noncitizen authorized to work</td></tr></table>' +
+            '<table style="margin-top:8px;"><tr>' +
+              '<td style="width:55%;"><span class="lbl">Signature of Employee</span><span class="sig">Amina Yusuf</span></td>' +
+              '<td><span class="lbl">Today&rsquo;s Date (mm/dd/yyyy)</span><span class="fill">11/14/2026</span></td>' +
+            '</tr></table>' +
+            '<div class="secttl">Section 2. Employer Review and Verification</div>' +
+            '<div class="sectsub">Employers or their authorized representative must examine the documentation presented by the employee and complete this section within three business days of the employee&rsquo;s first day of employment. <b>Left blank here on purpose</b> &mdash; it is completed in person, after examining the worker&rsquo;s original documents.</div>' +
+            '<table><tr>' +
+              '<th style="width:34%;">List A &mdash; Identity and Employment Authorization</th>' +
+              '<th style="width:33%;">List B &mdash; Identity</th>' +
+              '<th>List C &mdash; Employment Authorization</th>' +
+            '</tr><tr>' +
+              '<td><span class="lbl">Document Title</span><br/><br/><span class="lbl">Document Number</span><br/><br/><span class="lbl">Expiration Date (if any)</span><br/></td>' +
+              '<td><span class="lbl">Document Title</span><br/><br/><span class="lbl">Document Number</span><br/><br/><span class="lbl">Expiration Date (if any)</span><br/></td>' +
+              '<td><span class="lbl">Document Title</span><br/><br/><span class="lbl">Document Number</span><br/><br/><span class="lbl">Expiration Date (if any)</span><br/></td>' +
+            '</tr><tr>' +
+              '<td colspan="3"><span class="lbl">Additional Information</span><br/></td>' +
+            '</tr></table>' +
+            '<p class="small" style="margin:8px 0 4px;"><b>Certification:</b> I attest, under penalty of perjury, that (1) I have examined the documentation presented by the above-named employee, (2) the above-listed documentation appears to be genuine and to relate to the employee named, and (3) to the best of my knowledge the employee is authorized to work in the United States.</p>' +
+            '<table><tr>' +
+              '<td colspan="2"><span class="lbl">Last Name, First Name and Title of Employer or Authorized Representative</span><br/></td>' +
+              '<td><span class="lbl">Signature of Employer or Authorized Representative</span><br/></td>' +
+              '<td><span class="lbl">Today&rsquo;s Date</span><br/></td>' +
+            '</tr><tr>' +
+              '<td colspan="4"><span class="lbl">Employer&rsquo;s Business or Organization Name and Address</span>North Star Home Care LLC, Eagan, MN</td>' +
+            '</tr></table>' +
+            '<div class="foot"><span>Form I-9 &middot; Edition 08/01/23</span><span>Page 1 of 4</span></div>' +
+          '</div>';
+        }
+
+        function openDoc(which) {
+          currentDoc = which;
+          docArea.innerHTML = which === 'w4' ? w4Sheet() : i9Sheet();
+          docStatus.textContent = '';
+          showView('doc');
+        }
+        document.querySelectorAll('[data-doc]').forEach(function (btn) {
+          btn.addEventListener('click', function () { openDoc(btn.getAttribute('data-doc')); });
+        });
+        docDownload.addEventListener('click', function () { download(currentDoc, docStatus); });
+
+        function makePdf(node, filename, statusEl, cleanup) {
+          if (typeof html2pdf === 'undefined') {
+            statusEl.textContent = 'The form is on screen above \u2014 use your browser\u2019s Print and choose \u201cSave as PDF.\u201d';
+            if (cleanup) cleanup();
+            return;
+          }
+          statusEl.textContent = 'Preparing your PDF\u2026';
+          var opt = {
+            margin: 0,
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: 900 },
+            jsPDF: { unit: 'pt', format: 'letter', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
+          };
+          html2pdf().set(opt).from(node).save().then(function () {
+            statusEl.textContent = 'Downloaded: ' + filename;
+            if (cleanup) cleanup();
+          }).catch(function () {
+            statusEl.textContent = 'That download was blocked \u2014 use your browser\u2019s Print and choose \u201cSave as PDF\u201d on the form view instead.';
+            if (cleanup) cleanup();
+          });
+        }
+
+        function download(which, statusEl) {
+          var targetStatus = statusEl || dlStatus;
+          /* Stage the sheet ON screen, in the viewport. The old version parked
+             it at left:-10000px and the PDF came out completely blank. */
+          var stage = document.createElement('div');
+          stage.className = 'pdf-stage';
+          var label = which === 'packet' ? 'Full packet \u2014 W-4 + I-9' : (which === 'w4' ? 'Form W-4 (2026)' : 'Form I-9 (Edition 08/01/23)');
+          var sheetsHtml = which === 'packet'
+            ? w4Sheet() + i9Sheet()
+            : (which === 'w4' ? w4Sheet() : i9Sheet());
+          stage.innerHTML = '<div class="pdf-stage-note"><b>Preparing your PDF\u2026</b><span>' + label + ' for Amina Yusuf \u2014 this preview closes itself when the download starts.</span></div>';
+          var capture = document.createElement('div');
+          capture.style.background = '#ffffff';
+          capture.style.width = '816px';
+          capture.style.margin = '0 auto';
+          capture.innerHTML = sheetsHtml;
+          /* Fix the sheet width BEFORE capture, not after. */
+          capture.querySelectorAll('.sheet').forEach(function (s, idx) {
+            s.style.width = '816px';
+            s.style.maxWidth = 'none';
+            s.style.margin = '0 auto 24px';
+            s.style.boxShadow = 'none';
+            if (which === 'packet' && idx === 1) s.style.pageBreakBefore = 'always';
+          });
+          stage.appendChild(capture);
+          document.body.appendChild(stage);
+          stage.scrollTop = 0;
+          window.scrollTo(0, 0);
+          var filename = which === 'packet'
+            ? 'Amina-Yusuf-Onboarding-Packet.pdf'
+            : (which === 'w4' ? 'Amina-Yusuf-Form-W-4.pdf' : 'Amina-Yusuf-Form-I-9.pdf');
+          function cleanup() {
+            if (stage.parentNode) stage.parentNode.removeChild(stage);
+          }
+          function startCapture() {
+            /* html2canvas reads the live layout, so capture the node that is
+               actually painted inside the visible stage. */
+            makePdf(capture, filename, targetStatus, cleanup);
+          }
+          /* Wait for layout + webfonts (the signature/handwriting) so nothing
+             renders blank or in a fallback font. */
+          var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+          Promise.race([fontsReady, new Promise(function (r) { setTimeout(r, 1200); })]).then(function () {
+            requestAnimationFrame(function () { setTimeout(startCapture, 350); });
+          });
+        }
+        document.querySelectorAll('[data-download]').forEach(function (btn) {
+          btn.addEventListener('click', function () { download(btn.getAttribute('data-download'), dlStatus); });
+        });
+      })();
+    </script>
+  </body>
+</html>
